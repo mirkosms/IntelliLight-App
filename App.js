@@ -10,7 +10,7 @@ export default function App() {
     try {
       const res = await fetch(`http://192.168.1.10/${endpoint}`);
       if (endpoint === '') {
-        const data = await res.json();  // Odbiór danych w formacie JSON
+        const data = await res.json();
         setTemperature(data.temperature);
         setHumidity(data.humidity);
         setStatus('Dane odczytane pomyślnie!');
@@ -30,6 +30,10 @@ export default function App() {
       <Button title="Włącz LED (Niebieski)" onPress={() => sendRequestToESP32('led/on')} />
       <View style={styles.spacer} />
       <Button title="Wyłącz LED" onPress={() => sendRequestToESP32('led/off')} />
+      <View style={styles.spacer} />
+      <Button title="Włącz efekt Rainbow" onPress={() => sendRequestToESP32('led/rainbow/on')} />
+      <View style={styles.spacer} />
+      <Button title="Wyłącz efekt Rainbow" onPress={() => sendRequestToESP32('led/rainbow/off')} />
       <View style={styles.spacer} />
       <Button title="Odczytaj dane z czujników" onPress={() => sendRequestToESP32('')} />
 
