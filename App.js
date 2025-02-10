@@ -4,37 +4,48 @@ import { View, Text, Button, StyleSheet } from 'react-native';
 export default function App() {
   const [temperature, setTemperature] = useState(null);
   const [humidity, setHumidity] = useState(null);
-  const [error, setError] = useState('');
+  const [status, setStatus] = useState('');
 
-  const fetchSensorData = async () => {
+  const sendRequestToESP32 = async (endpoint) => {
     try {
-      const res = await fetch('http://192.168.1.10/sensor');
-      const data = await res.json();
-      setTemperature(data.temperature);
-      setHumidity(data.humidity);
-      setError('');
-    } catch (err) {
-      setError('Błąd połączenia: ' + err.message);
+      const res = await fetch(`http://192.168.1.10/${endpoint}`);
+      if (endpoint === '') {
+        const data = await res.json();  // Odbiór danych w formacie JSON
+        setTemperature(data.temperature);
+        setHumidity(data.humidity);
+        setStatus('Dane odczytane pomyślnie!');
+      } else {
+        const text = await res.text();
+        setStatus(text);
+      }
+    } catch (error) {
+      setStatus('Błąd połączenia: ' + error.message);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Odczyt danych z ESP32</Text>
-      <Button title="Pobierz dane" onPress={fetchSensorData} />
+      <Text style={styles.title}>Sterowanie ESP32 przez Wi-Fi</Text>
 
-      {error ? (
-        <Text style={styles.error}>{error}</Text>
-      ) : (
-        <View style={styles.dataContainer}>
-          {temperature !== null && (
-            <Text style={styles.dataText}>Temperatura: {temperature} °C</Text>
-          )}
-          {humidity !== null && (
-            <Text style={styles.dataText}>Wilgotność: {humidity} %</Text>
-          )}
-        </View>
-      )}
+      <Button title="Włącz LED (Niebieski)" onPress={() => sendRequestToESP32('led/on')} />
+      <View style={styles.spacer} />
+      <Button title="Wyłącz LED" onPress={() => sendRequestToESP32('led/off')} />
+      <View style={styles.spacer} />
+      <Button title="Odczytaj dane z czujników" onPress={() => sendRequestToESP32('')} />
+
+      <View style={styles.sensorData}>
+        {temperature !== null && humidity !== null && (
+          <>
+            <Text style={styles.dataLabel}>Temperatura:</Text>
+            <Text style={styles.dataValue}>{temperature} °C</Text>
+
+            <Text style={styles.dataLabel}>Wilgotność:</Text>
+            <Text style={styles.dataValue}>{humidity} %</Text>
+          </>
+        )}
+      </View>
+
+      <Text style={styles.status}>{status}</Text>
     </View>
   );
 }
@@ -45,21 +56,33 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f0f0f0',
+    padding: 20,
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
+    fontWeight: 'bold',
     marginBottom: 20,
   },
-  dataContainer: {
-    marginTop: 20,
+  spacer: {
+    marginVertical: 10,
   },
-  dataText: {
+  sensorData: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  dataLabel: {
     fontSize: 18,
+    fontWeight: '600',
+  },
+  dataValue: {
+    fontSize: 24,
+    color: '#007AFF',
     marginBottom: 10,
   },
-  error: {
+  status: {
     marginTop: 20,
     fontSize: 16,
-    color: 'red',
+    color: 'gray',
+    textAlign: 'center',
   },
 });
