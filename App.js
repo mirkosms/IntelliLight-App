@@ -1,11 +1,40 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Button, StyleSheet } from 'react-native';
 
 export default function App() {
+  const [temperature, setTemperature] = useState(null);
+  const [humidity, setHumidity] = useState(null);
+  const [error, setError] = useState('');
+
+  const fetchSensorData = async () => {
+    try {
+      const res = await fetch('http://192.168.1.10/sensor');
+      const data = await res.json();
+      setTemperature(data.temperature);
+      setHumidity(data.humidity);
+      setError('');
+    } catch (err) {
+      setError('Błąd połączenia: ' + err.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <Text style={styles.title}>Odczyt danych z ESP32</Text>
+      <Button title="Pobierz dane" onPress={fetchSensorData} />
+
+      {error ? (
+        <Text style={styles.error}>{error}</Text>
+      ) : (
+        <View style={styles.dataContainer}>
+          {temperature !== null && (
+            <Text style={styles.dataText}>Temperatura: {temperature} °C</Text>
+          )}
+          {humidity !== null && (
+            <Text style={styles.dataText}>Wilgotność: {humidity} %</Text>
+          )}
+        </View>
+      )}
     </View>
   );
 }
@@ -13,8 +42,24 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+  },
+  title: {
+    fontSize: 20,
+    marginBottom: 20,
+  },
+  dataContainer: {
+    marginTop: 20,
+  },
+  dataText: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  error: {
+    marginTop: 20,
+    fontSize: 16,
+    color: 'red',
   },
 });
