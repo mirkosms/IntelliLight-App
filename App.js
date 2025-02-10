@@ -2,22 +2,16 @@ import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 
 export default function App() {
-  const [temperature, setTemperature] = useState(null);
-  const [humidity, setHumidity] = useState(null);
+  const [activeEffect, setActiveEffect] = useState(null);
   const [status, setStatus] = useState('');
 
-  const sendRequestToESP32 = async (endpoint) => {
+  const sendRequestToESP32 = async (effect) => {
     try {
-      const res = await fetch(`http://192.168.1.10/${endpoint}`);
-      if (endpoint === '') {
-        const data = await res.json();
-        setTemperature(data.temperature);
-        setHumidity(data.humidity);
-        setStatus('Dane odczytane pomyślnie!');
-      } else {
-        const text = await res.text();
-        setStatus(text);
-      }
+      const res = await fetch(`http://192.168.1.10/toggle/${effect}`);
+      const text = await res.text();
+      setStatus(text);
+
+      setActiveEffect(prevEffect => (prevEffect === effect ? null : effect));
     } catch (error) {
       setStatus('Błąd połączenia: ' + error.message);
     }
@@ -27,27 +21,25 @@ export default function App() {
     <View style={styles.container}>
       <Text style={styles.title}>Sterowanie ESP32 przez Wi-Fi</Text>
 
-      <Button title="Włącz LED (Niebieski)" onPress={() => sendRequestToESP32('led/on')} />
+      <Button
+        title="LED (Niebieski)"
+        color={activeEffect === 'led' ? '#007AFF' : '#CCCCCC'}
+        onPress={() => sendRequestToESP32('led')}
+      />
       <View style={styles.spacer} />
-      <Button title="Wyłącz LED" onPress={() => sendRequestToESP32('led/off')} />
-      <View style={styles.spacer} />
-      <Button title="Włącz efekt Rainbow" onPress={() => sendRequestToESP32('led/rainbow/on')} />
-      <View style={styles.spacer} />
-      <Button title="Wyłącz efekt Rainbow" onPress={() => sendRequestToESP32('led/rainbow/off')} />
-      <View style={styles.spacer} />
-      <Button title="Odczytaj dane z czujników" onPress={() => sendRequestToESP32('')} />
 
-      <View style={styles.sensorData}>
-        {temperature !== null && humidity !== null && (
-          <>
-            <Text style={styles.dataLabel}>Temperatura:</Text>
-            <Text style={styles.dataValue}>{temperature} °C</Text>
+      <Button
+        title="Efekt Rainbow"
+        color={activeEffect === 'rainbow' ? '#007AFF' : '#CCCCCC'}
+        onPress={() => sendRequestToESP32('rainbow')}
+      />
+      <View style={styles.spacer} />
 
-            <Text style={styles.dataLabel}>Wilgotność:</Text>
-            <Text style={styles.dataValue}>{humidity} %</Text>
-          </>
-        )}
-      </View>
+      <Button
+        title="Efekt Pulsing"
+        color={activeEffect === 'pulsing' ? '#007AFF' : '#CCCCCC'}
+        onPress={() => sendRequestToESP32('pulsing')}
+      />
 
       <Text style={styles.status}>{status}</Text>
     </View>
@@ -69,19 +61,6 @@ const styles = StyleSheet.create({
   },
   spacer: {
     marginVertical: 10,
-  },
-  sensorData: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  dataLabel: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  dataValue: {
-    fontSize: 24,
-    color: '#007AFF',
-    marginBottom: 10,
   },
   status: {
     marginTop: 20,
