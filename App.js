@@ -1,34 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 
 export default function App() {
+  const [esp32IP, setEsp32IP] = useState('192.168.1.11'); // Domyślne IP (można zastąpić dynamicznym)
   const [activeEffect, setActiveEffect] = useState(null);
-  const [whiteTempMode, setWhiteTempMode] = useState(null);
+  const [activeWhiteEffect, setActiveWhiteEffect] = useState(null); // Dla trybów White Temperature
   const [temperature, setTemperature] = useState(null);
   const [humidity, setHumidity] = useState(null);
   const [showWhiteOptions, setShowWhiteOptions] = useState(false);
   const [status, setStatus] = useState('');
 
-  const sendRequestToESP32 = async (endpoint, isWhiteTemp = false, tempMode = '') => {
+  const fetchESP32IP = async () => {
     try {
-      const res = await fetch(`http://192.168.1.10/${endpoint}`);
+      const res = await fetch(`http://esp32.local/getIP`);
+      const ip = await res.text();
+      setEsp32IP(ip);
+    } catch (error) {
+      console.error("Błąd pobierania IP ESP32:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchESP32IP();
+  }, []);
+
+  const sendRequestToESP32 = async (endpoint, effect, isWhite = false) => {
+    try {
+      const res = await fetch(`http://${esp32IP}/${endpoint}`);
       const text = await res.text();
       setStatus(text);
 
-      if (endpoint === 'sensor') {
-        const data = JSON.parse(text);
-        setTemperature(data.temperature);
-        setHumidity(data.humidity);
+      if (isWhite) {
+        setActiveWhiteEffect(prevEffect => (prevEffect === effect ? null : effect));
+        setActiveEffect(null); // Wyłączenie ogólnych efektów
       } else {
-        if (isWhiteTemp) {
-          setWhiteTempMode(prevMode => (prevMode === tempMode ? null : tempMode));
-        } else {
-          setActiveEffect(prevEffect => (prevEffect === endpoint.split('/')[1] ? null : endpoint.split('/')[1]));
-          setWhiteTempMode(null);  // Resetowanie trybu White Temperature przy wyborze innego efektu
-        }
+        setActiveEffect(prevEffect => (prevEffect === effect ? null : effect));
+        setActiveWhiteEffect(null); // Wyłączenie efektów White Temperature
       }
     } catch (error) {
       setStatus('Błąd połączenia: ' + error.message);
+    }
+  };
+
+  const fetchSensorData = async () => {
+    try {
+      const res = await fetch(`http://${esp32IP}/sensor`);
+      const text = await res.text();
+      const matches = text.match(/Temperatura: ([\d.]+) °C\s*Wilgotność: ([\d.]+) %/);
+      if (matches) {
+        setTemperature(parseFloat(matches[1]));
+        setHumidity(parseFloat(matches[2]));
+      } else {
+        setStatus('Błąd parsowania danych z czujników');
+      }
+    } catch (error) {
+      setStatus('Błąd pobierania danych');
     }
   };
 
@@ -36,54 +62,36 @@ export default function App() {
     <View style={styles.container}>
       <Text style={styles.title}>Sterowanie ESP32 przez Wi-Fi</Text>
 
-      <Button title="LED (Niebieski)" color={activeEffect === 'led' ? '#007AFF' : '#CCCCCC'} onPress={() => sendRequestToESP32('toggle/led')} />
+      <Button title="LED (Niebieski)" color={activeEffect === 'led' ? '#007AFF' : '#CCCCCC'} onPress={() => sendRequestToESP32('toggle/led', 'led')} />
       <View style={styles.spacer} />
-      <Button title="Efekt Rainbow" color={activeEffect === 'rainbow' ? '#007AFF' : '#CCCCCC'} onPress={() => sendRequestToESP32('toggle/rainbow')} />
+      <Button title="Efekt Rainbow" color={activeEffect === 'rainbow' ? '#007AFF' : '#CCCCCC'} onPress={() => sendRequestToESP32('toggle/rainbow', 'rainbow')} />
       <View style={styles.spacer} />
-      <Button title="Efekt Pulsing" color={activeEffect === 'pulsing' ? '#007AFF' : '#CCCCCC'} onPress={() => sendRequestToESP32('toggle/pulsing')} />
+      <Button title="Efekt Pulsing" color={activeEffect === 'pulsing' ? '#007AFF' : '#CCCCCC'} onPress={() => sendRequestToESP32('toggle/pulsing', 'pulsing')} />
       <View style={styles.spacer} />
-      <Button title="Night Mode" color={activeEffect === 'night' ? '#007AFF' : '#CCCCCC'} onPress={() => sendRequestToESP32('toggle/night')} />
+      <Button title="Night Mode" color={activeEffect === 'night' ? '#007AFF' : '#CCCCCC'} onPress={() => sendRequestToESP32('toggle/night', 'night')} />
       <View style={styles.spacer} />
-      <Button title="Twinkle" color={activeEffect === 'twinkle' ? '#007AFF' : '#CCCCCC'} onPress={() => sendRequestToESP32('toggle/twinkle')} />
+      <Button title="Twinkle" color={activeEffect === 'twinkle' ? '#007AFF' : '#CCCCCC'} onPress={() => sendRequestToESP32('toggle/twinkle', 'twinkle')} />
       <View style={styles.spacer} />
 
-      <Button
-        title="White Temperature"
-        onPress={() => setShowWhiteOptions(!showWhiteOptions)}
-        color={showWhiteOptions ? '#FFA500' : '#CCCCCC'}
-      />
-
+      <Button title="White Temperature" onPress={() => setShowWhiteOptions(!showWhiteOptions)} color={showWhiteOptions ? "#FFA500" : "#CCCCCC"} />
       {showWhiteOptions && (
         <View>
-          <Button
-            title="Neutral White"
-            color={whiteTempMode === 'neutral' ? '#007AFF' : '#CCCCCC'}
-            onPress={() => sendRequestToESP32('toggle/white/neutral', true, 'neutral')}
-          />
+          <Button title="Neutral White" color={activeWhiteEffect === 'neutral' ? '#007AFF' : '#CCCCCC'} onPress={() => sendRequestToESP32('toggle/white/neutral', 'neutral', true)} />
           <View style={styles.spacer} />
-          <Button
-            title="Cool White"
-            color={whiteTempMode === 'cool' ? '#007AFF' : '#CCCCCC'}
-            onPress={() => sendRequestToESP32('toggle/white/cool', true, 'cool')}
-          />
+          <Button title="Cool White" color={activeWhiteEffect === 'cool' ? '#007AFF' : '#CCCCCC'} onPress={() => sendRequestToESP32('toggle/white/cool', 'cool', true)} />
           <View style={styles.spacer} />
-          <Button
-            title="Warm White"
-            color={whiteTempMode === 'warm' ? '#007AFF' : '#CCCCCC'}
-            onPress={() => sendRequestToESP32('toggle/white/warm', true, 'warm')}
-          />
+          <Button title="Warm White" color={activeWhiteEffect === 'warm' ? '#007AFF' : '#CCCCCC'} onPress={() => sendRequestToESP32('toggle/white/warm', 'warm', true)} />
         </View>
       )}
 
-      <View style={styles.spacer} />
-      <Button title="Odczytaj dane z czujników" onPress={() => sendRequestToESP32('sensor')} color="#007AFF" />
+      <Button title="Odczytaj dane z czujników" onPress={fetchSensorData} color="#007AFF" />
 
       {temperature !== null && humidity !== null && (
         <View style={styles.sensorData}>
           <Text style={styles.dataLabel}>Temperatura:</Text>
-          <Text style={styles.dataValue}>{temperature} °C</Text>
+          <Text style={styles.dataValue}>{temperature.toFixed(1)} °C</Text>
           <Text style={styles.dataLabel}>Wilgotność:</Text>
-          <Text style={styles.dataValue}>{humidity} %</Text>
+          <Text style={styles.dataValue}>{humidity.toFixed(1)} %</Text>
         </View>
       )}
 
