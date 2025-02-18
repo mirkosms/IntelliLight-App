@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
+import BrightnessControl from '../components/BrightnessControl';
 
 export default function PomodoroScreen() {
   const [esp32IP, setEsp32IP] = useState(null);
@@ -11,7 +12,7 @@ export default function PomodoroScreen() {
 
   const fetchESP32IP = async () => {
     try {
-      const res = await fetch('http://esp32.local/getIP'); // Upewnij się, że ESP32 ma poprawny adres
+      const res = await fetch('http://esp32.local/getIP');
       const ip = await res.text();
       setEsp32IP(ip);
     } catch (error) {
@@ -66,7 +67,7 @@ export default function PomodoroScreen() {
         color="#8E8E93" 
         onPress={() => sendPomodoroRequest("reset")} 
       />
-
+        {esp32IP && <BrightnessControl esp32IP={esp32IP} />} 
       <Text style={styles.status}>{status}</Text>
     </View>
   );

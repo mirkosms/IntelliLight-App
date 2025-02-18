@@ -14,7 +14,7 @@ export default function SensorScreen() {
   const fetchESP32IP = async () => {
     try {
       console.log("Próba pobrania adresu IP ESP32...");
-      const res = await fetch('http://esp32.local/getIP'); // Używanie dynamicznego adresu
+      const res = await fetch('http://esp32.local/getIP');
       const ip = await res.text();
       console.log("Pobrane IP:", ip);
       setEsp32IP(ip);
