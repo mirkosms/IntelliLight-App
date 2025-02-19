@@ -5,6 +5,7 @@ export default function SensorScreen() {
   const [esp32IP, setEsp32IP] = useState(null);
   const [temperature, setTemperature] = useState(null);
   const [humidity, setHumidity] = useState(null);
+  const [lightLevel, setLightLevel] = useState(null);
   const [status, setStatus] = useState('Ładowanie...');
 
   useEffect(() => {
@@ -37,10 +38,11 @@ export default function SensorScreen() {
       const text = await res.text();
       console.log("Odpowiedź z ESP32:", text);
 
-      const matches = text.match(/Temperatura: ([\d.]+) °C\s*Wilgotność: ([\d.]+) %/);
+      const matches = text.match(/Temperatura:\s*([\d.]+)\s*°C\s*Wilgotność:\s*([\d.]+)\s*%\s*Natężenie światła:\s*([\d.]+)\s*lx/);
       if (matches) {
         setTemperature(parseFloat(matches[1]));
         setHumidity(parseFloat(matches[2]));
+        setLightLevel(parseFloat(matches[3]));
         setStatus('');
       } else {
         setStatus('Błąd parsowania danych z czujników');
@@ -56,12 +58,14 @@ export default function SensorScreen() {
       <Text style={styles.title}>Dane z czujników</Text>
       <Button title="Odczytaj dane" onPress={fetchSensorData} color="#007AFF" />
 
-      {temperature !== null && humidity !== null && (
+      {temperature !== null && humidity !== null && lightLevel !== null && (
         <View style={styles.sensorData}>
           <Text style={styles.dataLabel}>Temperatura:</Text>
           <Text style={styles.dataValue}>{temperature.toFixed(1)} °C</Text>
           <Text style={styles.dataLabel}>Wilgotność:</Text>
           <Text style={styles.dataValue}>{humidity.toFixed(1)} %</Text>
+          <Text style={styles.dataLabel}>Natężenie światła:</Text>
+          <Text style={styles.dataValue}>{lightLevel.toFixed(2)} lx</Text>
         </View>
       )}
 

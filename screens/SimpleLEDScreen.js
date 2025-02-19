@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import BrightnessControl from '../components/BrightnessControl';
+import AutoBrightnessControl from '../components/AutoBrightnessControl';
 
 export default function SimpleLEDScreen() {
   const [esp32IP, setEsp32IP] = useState(null);
@@ -99,7 +100,10 @@ export default function SimpleLEDScreen() {
 
         </View>
       )}
-      {esp32IP && <BrightnessControl esp32IP={esp32IP} />}  
+
+      {esp32IP && <BrightnessControl esp32IP={esp32IP} />}
+      {esp32IP && <AutoBrightnessControl esp32IP={esp32IP} />}  
+      
       <Text style={styles.status}>{status}</Text>
     </View>
   );
