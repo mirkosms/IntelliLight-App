@@ -6,6 +6,7 @@ import MenuScreen from './screens/MenuScreen';
 import SimpleLEDScreen from './screens/SimpleLEDScreen';
 import PomodoroScreen from './screens/PomodoroScreen';
 import SensorScreen from './screens/SensorScreen';
+import CustomLEDScreen from './screens/CustomLEDScreen';
 
 const Stack = createStackNavigator();
 
@@ -31,11 +32,14 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Menu">
           <Stack.Screen name="Menu">
-            {props => <MenuScreen {...props} esp32IP={esp32IP} />}
+            {(props) => <MenuScreen {...props} esp32IP={esp32IP} />}
           </Stack.Screen>
           <Stack.Screen name="Simple LED" component={SimpleLEDScreen} />
           <Stack.Screen name="Pomodoro Timer" component={PomodoroScreen} />
           <Stack.Screen name="Data from Sensors" component={SensorScreen} />
+          <Stack.Screen name="Custom LED" options={{ title: 'Custom LED Color' }}>
+            {(props) => <CustomLEDScreen {...props} esp32IP={esp32IP} />}
+          </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

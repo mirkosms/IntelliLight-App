@@ -66,6 +66,8 @@ export default function MenuScreen({ navigation }) {
       <Button title="Pomodoro Timer" onPress={() => navigation.navigate('Pomodoro Timer')} />
       <View style={styles.spacer} />
       <Button title="Data from Sensors" onPress={() => navigation.navigate('Data from Sensors')} />
+      <View style={styles.spacer} />
+      <Button title="Custom LED Color" onPress={() => navigation.navigate('Custom LED')} />
 
       <View style={styles.separator} />
 
