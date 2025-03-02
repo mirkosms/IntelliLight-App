@@ -6,7 +6,8 @@ import MenuScreen from './screens/MenuScreen';
 import SimpleLEDScreen from './screens/SimpleLEDScreen';
 import PomodoroScreen from './screens/PomodoroScreen';
 import SensorScreen from './screens/SensorScreen';
-import CustomLEDScreen from './screens/CustomLEDScreen';
+import CustomLEDScreen from './screens/CustomLEDScreen'; // aktualne rozwiązanie z suwakami
+import PaletteLEDScreen from './screens/PaletteLEDScreen'; // nowy ekran z paletą
 
 const Stack = createStackNavigator();
 
@@ -39,6 +40,9 @@ export default function App() {
           <Stack.Screen name="Data from Sensors" component={SensorScreen} />
           <Stack.Screen name="Custom LED" options={{ title: 'Custom LED Color' }}>
             {(props) => <CustomLEDScreen {...props} esp32IP={esp32IP} />}
+          </Stack.Screen>
+          <Stack.Screen name="Palette LED" options={{ title: 'Palette LED Color' }}>
+            {(props) => <PaletteLEDScreen {...props} esp32IP={esp32IP} />}
           </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>

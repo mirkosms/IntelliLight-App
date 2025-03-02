@@ -11,7 +11,6 @@ export default function MenuScreen({ navigation }) {
     fetchMotionStatus();
   }, []);
 
-  // Pobiera IP ESP32
   const fetchESP32IP = async () => {
     try {
       const res = await fetch(`http://esp32.local/getIP`);
@@ -22,7 +21,6 @@ export default function MenuScreen({ navigation }) {
     }
   };
 
-  // Pobiera aktualny status czujnika ruchu
   const fetchMotionStatus = async () => {
     if (!esp32IP) return;
     try {
@@ -34,7 +32,6 @@ export default function MenuScreen({ navigation }) {
     }
   };
 
-  // Przełącza tryb czujnika ruchu
   const toggleMotionMode = async () => {
     if (!esp32IP) return;
     try {
@@ -46,7 +43,6 @@ export default function MenuScreen({ navigation }) {
     }
   };
 
-  // Ustawia czas bezczynności czujnika ruchu
   const updateMotionTimeout = async () => {
     if (!esp32IP) return;
     try {
@@ -68,16 +64,16 @@ export default function MenuScreen({ navigation }) {
       <Button title="Data from Sensors" onPress={() => navigation.navigate('Data from Sensors')} />
       <View style={styles.spacer} />
       <Button title="Custom LED Color" onPress={() => navigation.navigate('Custom LED')} />
+      <View style={styles.spacer} />
+      <Button title="Palette LED Color" onPress={() => navigation.navigate('Palette LED')} />
 
       <View style={styles.separator} />
 
-      {/* Przełącznik czujnika ruchu */}
       <View style={styles.switchContainer}>
         <Text style={styles.label}>Czujnik ruchu</Text>
         <Switch value={motionEnabled} onValueChange={toggleMotionMode} />
       </View>
 
-      {/* Pole do ustawiania czasu bezczynności */}
       <Text>Podaj czas bezczynności (sekundy):</Text>
       <TextInput
         style={styles.input}
