@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, TextInput, Switch } from 'react-native';
 
-export default function MenuScreen({ navigation }) {
-  const [esp32IP, setEsp32IP] = useState(null);
-  const [motionTimeout, setMotionTimeout] = useState('60'); // Domyślnie 60s
+export default function MenuScreen({ navigation, esp32IP }) {
+  const [motionTimeout, setMotionTimeout] = useState('60');
   const [motionEnabled, setMotionEnabled] = useState(false);
 
   useEffect(() => {
@@ -15,9 +14,9 @@ export default function MenuScreen({ navigation }) {
     try {
       const res = await fetch(`http://esp32.local/getIP`);
       const ip = await res.text();
-      setEsp32IP(ip);
+      // IP jest przekazywane przez props w App.js
     } catch (error) {
-      console.error("Błąd pobierania IP ESP32:", error);
+      console.error("Error fetching ESP32 IP:", error);
     }
   };
 
@@ -28,7 +27,7 @@ export default function MenuScreen({ navigation }) {
       const status = await res.text();
       setMotionEnabled(status.includes("ON"));
     } catch (error) {
-      console.error("Błąd pobierania statusu czujnika ruchu:", error);
+      console.error("Error fetching motion sensor status:", error);
     }
   };
 
@@ -39,7 +38,7 @@ export default function MenuScreen({ navigation }) {
       const status = await res.text();
       setMotionEnabled(status.includes("ON"));
     } catch (error) {
-      console.error("Błąd przełączania czujnika ruchu:", error);
+      console.error("Error toggling motion sensor:", error);
     }
   };
 
@@ -47,41 +46,37 @@ export default function MenuScreen({ navigation }) {
     if (!esp32IP) return;
     try {
       await fetch(`http://${esp32IP}/setMotionTimeout?seconds=${motionTimeout}`);
-      alert(`Zmieniono czas bezczynności na ${motionTimeout} sekund`);
+      alert(`Timeout updated to ${motionTimeout} seconds`);
     } catch (error) {
-      console.error("Błąd ustawiania czasu bezczynności:", error);
+      console.error("Error updating motion timeout:", error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Wybierz opcję:</Text>
+      <Text style={styles.title}>Choose an Option:</Text>
       
-      <Button title="Simple LED" onPress={() => navigation.navigate('Simple LED')} />
+      <Button title="LED Control" onPress={() => navigation.navigate('LED Control')} />
       <View style={styles.spacer} />
       <Button title="Pomodoro Timer" onPress={() => navigation.navigate('Pomodoro Timer')} />
       <View style={styles.spacer} />
       <Button title="Data from Sensors" onPress={() => navigation.navigate('Data from Sensors')} />
-      <View style={styles.spacer} />
-      <Button title="Custom LED Color" onPress={() => navigation.navigate('Custom LED')} />
-      <View style={styles.spacer} />
-      <Button title="Palette LED Color" onPress={() => navigation.navigate('Palette LED')} />
 
       <View style={styles.separator} />
 
       <View style={styles.switchContainer}>
-        <Text style={styles.label}>Czujnik ruchu</Text>
+        <Text style={styles.label}>Motion Sensor</Text>
         <Switch value={motionEnabled} onValueChange={toggleMotionMode} />
       </View>
 
-      <Text>Podaj czas bezczynności (sekundy):</Text>
+      <Text>Set Timeout (seconds):</Text>
       <TextInput
         style={styles.input}
         keyboardType="numeric"
         value={motionTimeout}
         onChangeText={setMotionTimeout}
       />
-      <Button title="Zapisz czas bezczynności" onPress={updateMotionTimeout} color="#007AFF" />
+      <Button title="Update Timeout" onPress={updateMotionTimeout} color="#007AFF" />
     </View>
   );
 }
