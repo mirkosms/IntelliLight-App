@@ -91,7 +91,7 @@ export default function MenuScreen({ navigation, esp32IP }) {
         value={motionTimeout}
         onChangeText={setMotionTimeout}
       />
-      <AppButton title="Ustaw czas wyłączenia" onPress={updateMotionTimeout} />
+      <AppButton title="Ustaw czas wyłączenia LED" onPress={updateMotionTimeout} />
     </View>
   );
 }
