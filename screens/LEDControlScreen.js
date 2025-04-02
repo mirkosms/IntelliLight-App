@@ -5,11 +5,12 @@ import {
   TouchableOpacity, 
   StyleSheet, 
   ScrollView, 
-  Button, 
   Alert 
 } from 'react-native';
 import BrightnessControl from '../components/BrightnessControl';
 import AutoBrightnessControl from '../components/AutoBrightnessControl';
+import AppButton from '../components/AppButton';
+import { GlobalStyles } from '../GlobalStyles';
 
 const PALETTE = [
   { name: 'Red', r: 255, g: 0, b: 0 },
@@ -50,7 +51,6 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
 
   // Funkcja dla trybów White Temperature
   const toggleWhiteMode = (mode) => {
-    // Jeśli już aktywny, to wyłącz (toggle off)
     if (activeWhiteEffect === mode) {
       fetch(`http://${esp32IP}/toggle/white/${mode}`)
         .then(res => res.text())
@@ -131,9 +131,8 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
   );
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Górna część: Paleta kolorów (3x3) */}
-      <Text style={styles.sectionTitle}>Paleta kolorów</Text>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <Text style={GlobalStyles.heading1}>Paleta kolorów</Text>
       <View style={styles.paletteContainer}>
         {PALETTE.map((color, index) => (
           <TouchableOpacity
@@ -146,7 +145,6 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
         ))}
       </View>
 
-      {/* Sekcja White Temperature */}
       <TouchableOpacity 
         style={styles.expandButton} 
         onPress={() => setShowWhiteOptions(!showWhiteOptions)}
@@ -155,7 +153,6 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
       </TouchableOpacity>
       {showWhiteOptions && renderWhiteOptions()}
 
-      {/* Sekcja Continuous Effects */}
       <TouchableOpacity 
         style={styles.expandButton} 
         onPress={() => setShowContinuousOptions(!showContinuousOptions)}
@@ -164,18 +161,16 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
       </TouchableOpacity>
       {showContinuousOptions && renderContinuousOptions()}
 
-      {/* Kontrolki jasności */}
       <View style={styles.brightnessContainer}>
         <BrightnessControl esp32IP={esp32IP} />
         <AutoBrightnessControl esp32IP={esp32IP} />
       </View>
 
-      {/* Przycisk do przejścia do niestandardowego ustawienia koloru LED */}
       <View style={styles.footer}>
-        <Button 
+        <AppButton 
           title="Niestandardowy kolor LED" 
-          onPress={() => navigation.navigate('Custom LED')} 
-          color="#FFA500" 
+          variant="secondary"
+          onPress={() => navigation.navigate('Custom LED')}
         />
       </View>
 
@@ -185,15 +180,10 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scrollContainer: {
     padding: 20,
-    backgroundColor: '#f0f0f0',
+    flexGrow: 1,
     alignItems: 'center',
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginVertical: 10,
   },
   paletteContainer: {
     flexDirection: 'row',

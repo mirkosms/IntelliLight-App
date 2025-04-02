@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, TextInput, Switch } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Switch } from 'react-native';
+import { GlobalStyles } from '../GlobalStyles';
+import AppButton from '../components/AppButton';
 
 export default function MenuScreen({ navigation, esp32IP }) {
   const [motionTimeout, setMotionTimeout] = useState('60');
@@ -53,50 +55,33 @@ export default function MenuScreen({ navigation, esp32IP }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Wybierz opcję:</Text>
+    <View style={GlobalStyles.screenContainer}>
+      <Text style={GlobalStyles.heading1}>Wybierz opcję:</Text>
       
-      <Button title="LED Control" onPress={() => navigation.navigate('LED Control')} />
-      <View style={styles.spacer} />
-      <Button title="Pomodoro Timer" onPress={() => navigation.navigate('Pomodoro Timer')} />
-      <View style={styles.spacer} />
-      <Button title="Data from Sensors" onPress={() => navigation.navigate('Data from Sensors')} />
+      <AppButton title="LED Control" onPress={() => navigation.navigate('LED Control')} />
+      <AppButton title="Pomodoro Timer" onPress={() => navigation.navigate('Pomodoro Timer')} />
+      <AppButton title="Data from Sensors" onPress={() => navigation.navigate('Data from Sensors')} />
 
       <View style={styles.separator} />
 
       <View style={styles.switchContainer}>
-        <Text style={styles.label}>Czujnik ruchu</Text>
+        <Text style={GlobalStyles.heading2}>Czujnik ruchu</Text>
         <Switch value={motionEnabled} onValueChange={toggleMotionMode} />
       </View>
 
-      <Text>Ustaw czas wyłączenia (sekundy):</Text>
+      <Text style={styles.label}>Czas bezczynności (sekundy):</Text>
       <TextInput
         style={styles.input}
         keyboardType="numeric"
         value={motionTimeout}
         onChangeText={setMotionTimeout}
       />
-      <Button title="Ustaw czas wyłączenia" onPress={updateMotionTimeout} color="#007AFF" />
+      <AppButton title="Ustaw czas wyłączenia" onPress={updateMotionTimeout} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    padding: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  spacer: {
-    marginVertical: 10,
-  },
   separator: {
     marginVertical: 20,
     height: 1,
@@ -110,7 +95,8 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    marginRight: 10,
+    color: '#333',
+    marginBottom: 5,
   },
   input: {
     borderWidth: 1,

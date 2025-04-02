@@ -1,7 +1,10 @@
+// PomodoroScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import BrightnessControl from '../components/BrightnessControl';
 import AutoBrightnessControl from '../components/AutoBrightnessControl';
+import AppButton from '../components/AppButton';
+import { GlobalStyles } from '../GlobalStyles';
 
 export default function PomodoroScreen() {
   const [esp32IP, setEsp32IP] = useState(null);
@@ -24,8 +27,8 @@ export default function PomodoroScreen() {
 
   const sendPomodoroRequest = async (mode) => {
     if (!esp32IP) {
-        setStatus('Brak adresu ESP32');
-        return;
+      setStatus('Brak adresu ESP32');
+      return;
     }
 
     const url = `http://${esp32IP}/pomodoro?mode=${mode}`;
@@ -35,60 +38,34 @@ export default function PomodoroScreen() {
     const timeout = setTimeout(() => controller.abort(), 5000); // Anuluj po 5 sek
 
     try {
-        const res = await fetch(url, { signal: controller.signal });
-        clearTimeout(timeout);
-        const text = await res.text();
-        console.log("Odpowiedź serwera:", text);
-        setStatus(text);
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+      const text = await res.text();
+      console.log("Odpowiedź serwera:", text);
+      setStatus(text);
     } catch (error) {
-        console.error("Błąd połączenia:", error);
-        setStatus('Błąd połączenia: ' + error.message);
+      console.error("Błąd połączenia:", error);
+      setStatus('Błąd połączenia: ' + error.message);
     }
-};
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Timer Pomodoro</Text>
+    <View style={GlobalStyles.screenContainer}>
+      <Text style={GlobalStyles.heading1}>Timer Pomodoro</Text>
       
-      <Button title="Rozpocznij sesję skupienia (30 min)" 
-        color="#007AFF" 
-        onPress={() => sendPomodoroRequest("focus")} 
-      />
-      <View style={styles.spacer} />
-      
-      <Button title="Rozpocznij przerwę (5 min)" 
-        color="#FF3B30" 
-        onPress={() => sendPomodoroRequest("break")} 
-      />
-      <View style={styles.spacer} />
+      <AppButton title="Rozpocznij sesję skupienia (30 min)" onPress={() => sendPomodoroRequest("focus")} style={{ backgroundColor: '#34C759' }} />
+      <AppButton title="Rozpocznij przerwę (5 min)" onPress={() => sendPomodoroRequest("break")} variant="primary" style={{ backgroundColor: '#FF3B30' }} />
+      <AppButton title="Resetuj timer" onPress={() => sendPomodoroRequest("reset")} variant="primary" style={{ backgroundColor: '#8E8E93' }} />
 
-      <Button title="Resetuj timer" 
-        color="#8E8E93" 
-        onPress={() => sendPomodoroRequest("reset")} 
-      />
-        {esp32IP && <BrightnessControl esp32IP={esp32IP} />}
-        {esp32IP && <AutoBrightnessControl esp32IP={esp32IP} />}  
+      {esp32IP && <BrightnessControl esp32IP={esp32IP} />}
+      {esp32IP && <AutoBrightnessControl esp32IP={esp32IP} />}
+      
       <Text style={styles.status}>{status}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    padding: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  spacer: {
-    marginVertical: 10,
-  },
   status: {
     marginTop: 20,
     fontSize: 16,

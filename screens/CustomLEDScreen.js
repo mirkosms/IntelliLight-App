@@ -1,6 +1,9 @@
+// CustomLEDScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, Alert, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
+import AppButton from '../components/AppButton';
+import { GlobalStyles } from '../GlobalStyles';
 
 export default function CustomLEDScreen({ esp32IP, navigation }) {
   const [red, setRed] = useState(0);
@@ -35,7 +38,7 @@ export default function CustomLEDScreen({ esp32IP, navigation }) {
       const text = await res.text();
       Alert.alert("Sukces", text);
     } catch (error) {
-      Alert.alert("Błąd", "Nie udało się ustawić koloru");
+      Alert.alert("Błąd", "Nie udało się ustawić koloru LED");
       console.error("Błąd przy ustawianiu koloru:", error);
     }
   };
@@ -43,8 +46,8 @@ export default function CustomLEDScreen({ esp32IP, navigation }) {
   const previewColor = `rgb(${red}, ${green}, ${blue})`;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Wybierz niestandardowy kolor LED</Text>
+    <View style={GlobalStyles.screenContainer}>
+      <Text style={GlobalStyles.heading1}>Wybierz niestandardowy kolor LED</Text>
       
       <View style={[styles.preview, { backgroundColor: previewColor }]} />
       
@@ -78,24 +81,12 @@ export default function CustomLEDScreen({ esp32IP, navigation }) {
         onValueChange={(value) => setBlue(value)}
       />
       
-      <Button title="Ustaw kolor LED" onPress={sendCustomColor} />
-      <View style={styles.spacer} />
+      <AppButton title="Ustaw kolor LED" onPress={sendCustomColor} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f0f0f0',
-    alignItems: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   preview: {
     width: '100%',
     height: 100,
@@ -107,12 +98,10 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginVertical: 5,
+    color: '#333',
   },
   slider: {
     width: '100%',
     height: 40,
-  },
-  spacer: {
-    marginTop: 20,
   },
 });

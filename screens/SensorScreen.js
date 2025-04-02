@@ -1,5 +1,8 @@
+// SensorScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import AppButton from '../components/AppButton';
+import { GlobalStyles } from '../GlobalStyles';
 
 export default function SensorScreen() {
   const [esp32IP, setEsp32IP] = useState(null);
@@ -14,10 +17,8 @@ export default function SensorScreen() {
 
   const fetchESP32IP = async () => {
     try {
-      console.log("Próba pobrania adresu IP ESP32...");
       const res = await fetch('http://esp32.local/getIP');
       const ip = await res.text();
-      console.log("Pobrane IP:", ip);
       setEsp32IP(ip);
       setStatus('');
     } catch (error) {
@@ -33,11 +34,8 @@ export default function SensorScreen() {
     }
 
     try {
-      console.log(`Wysyłanie żądania do: http://${esp32IP}/sensor`);
       const res = await fetch(`http://${esp32IP}/sensor`);
       const text = await res.text();
-      console.log("Odpowiedź z ESP32:", text);
-
       const matches = text.match(/Temperatura:\s*([\d.]+)\s*°C\s*Wilgotność:\s*([\d.]+)\s*%\s*Natężenie światła:\s*([\d.]+)\s*lx/);
       if (matches) {
         setTemperature(parseFloat(matches[1]));
@@ -54,9 +52,9 @@ export default function SensorScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Dane z czujników</Text>
-      <Button title="Odczytaj dane" onPress={fetchSensorData} color="#007AFF" />
+    <View style={GlobalStyles.screenContainer}>
+      <Text style={GlobalStyles.heading1}>Dane z czujników</Text>
+      <AppButton title="Odczytaj dane" onPress={fetchSensorData} />
 
       {temperature !== null && humidity !== null && lightLevel !== null && (
         <View style={styles.sensorData}>
@@ -75,18 +73,6 @@ export default function SensorScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    padding: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   sensorData: {
     marginTop: 20,
     alignItems: 'center',
@@ -94,6 +80,7 @@ const styles = StyleSheet.create({
   dataLabel: {
     fontSize: 18,
     fontWeight: '600',
+    color: '#333',
   },
   dataValue: {
     fontSize: 24,
