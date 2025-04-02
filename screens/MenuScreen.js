@@ -55,11 +55,27 @@ export default function MenuScreen({ navigation, esp32IP }) {
 
   return (
     <View style={GlobalStyles.screenContainer}>
+      <Text style={styles.welcomeText}>Witaj w aplikacji IntelliLight!</Text>
       <Text style={GlobalStyles.heading1}>Wybierz opcję:</Text>
       
-      <AppButton title="LED Control" onPress={() => navigation.navigate('LED Control')} />
-      <AppButton title="Pomodoro Timer" onPress={() => navigation.navigate('Pomodoro Timer')} />
-      <AppButton title="Data from Sensors" onPress={() => navigation.navigate('Data from Sensors')} />
+      <AppButton 
+        title="Sterowanie LED" 
+        onPress={() => navigation.navigate('LED Control')} 
+        style={[styles.mainButton, { backgroundColor: '#FFCC00' }]}
+        textStyle={{ color: '#000', fontSize: 20 }}
+      />
+      <AppButton 
+        title="Timer Pomodoro" 
+        onPress={() => navigation.navigate('Pomodoro Timer')} 
+        style={[styles.mainButton, { backgroundColor: '#FFCC00' }]}
+        textStyle={{ color: '#000', fontSize: 20 }}
+      />
+      <AppButton 
+        title="Dane z czujników" 
+        onPress={() => navigation.navigate('Data from Sensors')} 
+        style={[styles.mainButton, { backgroundColor: '#FFCC00' }]}
+        textStyle={{ color: '#000', fontSize: 20 }}
+      />
 
       <View style={styles.separator} />
 
@@ -81,6 +97,17 @@ export default function MenuScreen({ navigation, esp32IP }) {
 }
 
 const styles = StyleSheet.create({
+  welcomeText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#222',
+    marginBottom: 15,
+  },
+  mainButton: {
+    width: '80%',
+    marginVertical: 10,
+    paddingVertical: 15,
+  },
   separator: {
     marginVertical: 20,
     height: 1,

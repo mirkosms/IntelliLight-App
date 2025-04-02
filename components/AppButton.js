@@ -1,11 +1,11 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-export default function AppButton({ title, onPress, variant = 'primary', style = {} }) {
+export default function AppButton({ title, onPress, variant = 'primary', style = {}, textStyle = {} }) {
   const backgroundColor = variant === 'primary' ? '#007AFF' : variant === 'secondary' ? '#FFA500' : '#007AFF';
   return (
     <TouchableOpacity style={[styles.button, { backgroundColor }, style]} onPress={onPress}>
-      <Text style={styles.buttonText}>{title}</Text>
+      <Text style={[styles.buttonText, textStyle]}>{title}</Text>
     </TouchableOpacity>
   );
 }

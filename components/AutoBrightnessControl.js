@@ -53,7 +53,7 @@ export default function AutoBrightnessControl({ esp32IP }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Automatyczna Jasność</Text>
+      <Text style={styles.label}>Automatyczna jasność</Text>
       <Switch value={autoBrightnessEnabled} onValueChange={toggleAutoBrightness} />
       <Text style={styles.lightLevel}>
         Natężenie światła: {lightLevel !== null ? `${lightLevel.toFixed(2)} lx` : "Brak danych"}
