@@ -37,14 +37,14 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
     fetch(`http://${esp32IP}/toggle/${effect}`)
       .then(res => res.text())
       .then(text => setStatus(text))
-      .catch(error => setStatus('Connection error: ' + error.message));
+      .catch(error => setStatus('Błąd połączenia: ' + error.message));
   };
 
   const deactivateContinuousEffect = (effect) => {
     fetch(`http://${esp32IP}/toggle/${effect}`)
       .then(res => res.text())
       .then(text => setStatus(text))
-      .catch(error => setStatus('Connection error: ' + error.message));
+      .catch(error => setStatus('Błąd połączenia: ' + error.message));
     setActiveEffect(null);
   };
 
@@ -55,13 +55,13 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
       fetch(`http://${esp32IP}/toggle/white/${mode}`)
         .then(res => res.text())
         .then(text => setStatus(text))
-        .catch(error => setStatus('Connection error: ' + error.message));
+        .catch(error => setStatus('Błąd połączenia: ' + error.message));
       setActiveWhiteEffect(null);
     } else {
       fetch(`http://${esp32IP}/toggle/white/${mode}`)
         .then(res => res.text())
         .then(text => setStatus(text))
-        .catch(error => setStatus('Connection error: ' + error.message));
+        .catch(error => setStatus('Błąd połączenia: ' + error.message));
       setActiveWhiteEffect(mode);
       setActiveEffect(null);
     }
@@ -70,7 +70,7 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
   // Funkcja ustawiająca kolor z palety
   const choosePaletteColor = async (r, g, b) => {
     if (!esp32IP) {
-      Alert.alert("Error", "No ESP32 IP address");
+      Alert.alert("Błąd", "Brak adresu ESP32");
       return;
     }
     try {
@@ -80,7 +80,7 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
       setActiveEffect("palette");
       setActiveWhiteEffect(null);
     } catch (error) {
-      Alert.alert("Error", "Failed to set LED color");
+      Alert.alert("Błąd", "Nie udało się ustawić koloru LED");
     }
   };
 
@@ -133,7 +133,7 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Górna część: Paleta kolorów (3x3) */}
-      <Text style={styles.sectionTitle}>Color Palette</Text>
+      <Text style={styles.sectionTitle}>Paleta kolorów</Text>
       <View style={styles.paletteContainer}>
         {PALETTE.map((color, index) => (
           <TouchableOpacity
@@ -151,7 +151,7 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
         style={styles.expandButton} 
         onPress={() => setShowWhiteOptions(!showWhiteOptions)}
       >
-        <Text style={styles.expandButtonText}>White Temperature</Text>
+        <Text style={styles.expandButtonText}>Temperatura bieli</Text>
       </TouchableOpacity>
       {showWhiteOptions && renderWhiteOptions()}
 
@@ -160,7 +160,7 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
         style={styles.expandButton} 
         onPress={() => setShowContinuousOptions(!showContinuousOptions)}
       >
-        <Text style={styles.expandButtonText}>Continuous Effects</Text>
+        <Text style={styles.expandButtonText}>Efekty ciągłe</Text>
       </TouchableOpacity>
       {showContinuousOptions && renderContinuousOptions()}
 
@@ -170,10 +170,10 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
         <AutoBrightnessControl esp32IP={esp32IP} />
       </View>
 
-      {/* Przycisk do przejścia do Custom LED Color */}
+      {/* Przycisk do przejścia do niestandardowego ustawienia koloru LED */}
       <View style={styles.footer}>
         <Button 
-          title="Custom LED Color" 
+          title="Niestandardowy kolor LED" 
           onPress={() => navigation.navigate('Custom LED')} 
           color="#FFA500" 
         />

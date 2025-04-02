@@ -46,25 +46,23 @@ export default function PomodoroScreen() {
     }
 };
 
-
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Pomodoro Timer</Text>
+      <Text style={styles.title}>Timer Pomodoro</Text>
       
-      <Button title="Start Focus Session (25 min)" 
+      <Button title="Rozpocznij sesję skupienia (30 min)" 
         color="#007AFF" 
         onPress={() => sendPomodoroRequest("focus")} 
       />
       <View style={styles.spacer} />
       
-      <Button title="Start Break (5 min)" 
+      <Button title="Rozpocznij przerwę (5 min)" 
         color="#FF3B30" 
         onPress={() => sendPomodoroRequest("break")} 
       />
       <View style={styles.spacer} />
 
-      <Button title="Reset Timer" 
+      <Button title="Resetuj timer" 
         color="#8E8E93" 
         onPress={() => sendPomodoroRequest("reset")} 
       />

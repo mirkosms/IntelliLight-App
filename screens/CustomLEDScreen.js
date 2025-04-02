@@ -80,7 +80,6 @@ export default function CustomLEDScreen({ esp32IP, navigation }) {
       
       <Button title="Ustaw kolor LED" onPress={sendCustomColor} />
       <View style={styles.spacer} />
-      <Button title="Powrót do Menu" onPress={() => navigation.goBack()} />
     </View>
   );
 }

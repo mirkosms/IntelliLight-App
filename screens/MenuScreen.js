@@ -46,7 +46,7 @@ export default function MenuScreen({ navigation, esp32IP }) {
     if (!esp32IP) return;
     try {
       await fetch(`http://${esp32IP}/setMotionTimeout?seconds=${motionTimeout}`);
-      alert(`Timeout updated to ${motionTimeout} seconds`);
+      alert(`Czas wyłączenia ustawiony na ${motionTimeout} sekund`);
     } catch (error) {
       console.error("Error updating motion timeout:", error);
     }
@@ -54,7 +54,7 @@ export default function MenuScreen({ navigation, esp32IP }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Choose an Option:</Text>
+      <Text style={styles.title}>Wybierz opcję:</Text>
       
       <Button title="LED Control" onPress={() => navigation.navigate('LED Control')} />
       <View style={styles.spacer} />
@@ -65,18 +65,18 @@ export default function MenuScreen({ navigation, esp32IP }) {
       <View style={styles.separator} />
 
       <View style={styles.switchContainer}>
-        <Text style={styles.label}>Motion Sensor</Text>
+        <Text style={styles.label}>Czujnik ruchu</Text>
         <Switch value={motionEnabled} onValueChange={toggleMotionMode} />
       </View>
 
-      <Text>Set Timeout (seconds):</Text>
+      <Text>Ustaw czas wyłączenia (sekundy):</Text>
       <TextInput
         style={styles.input}
         keyboardType="numeric"
         value={motionTimeout}
         onChangeText={setMotionTimeout}
       />
-      <Button title="Update Timeout" onPress={updateMotionTimeout} color="#007AFF" />
+      <Button title="Ustaw czas wyłączenia" onPress={updateMotionTimeout} color="#007AFF" />
     </View>
   );
 }
