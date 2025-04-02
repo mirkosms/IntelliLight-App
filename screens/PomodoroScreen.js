@@ -8,6 +8,7 @@ import { GlobalStyles } from '../GlobalStyles';
 export default function PomodoroScreen() {
   const [esp32IP, setEsp32IP] = useState(null);
   const [status, setStatus] = useState('');
+  const [showBrightness, setShowBrightness] = useState(false);
 
   useEffect(() => {
     fetchESP32IP();
@@ -34,7 +35,7 @@ export default function PomodoroScreen() {
     console.log("Wysyłam żądanie:", url);
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000); // Anuluj po 5 sek
+    const timeout = setTimeout(() => controller.abort(), 5000);
 
     try {
       const res = await fetch(url, { signal: controller.signal });
@@ -52,12 +53,35 @@ export default function PomodoroScreen() {
     <View style={GlobalStyles.screenContainer}>
       <Text style={GlobalStyles.heading1}>Timer Pomodoro</Text>
       
-      <AppButton title="Rozpocznij sesję skupienia (30 min)" onPress={() => sendPomodoroRequest("focus")} style={{ backgroundColor: '#34C759' }} />
-      <AppButton title="Rozpocznij przerwę (5 min)" onPress={() => sendPomodoroRequest("break")} variant="primary" style={{ backgroundColor: '#FF3B30' }} />
-      <AppButton title="Resetuj timer" onPress={() => sendPomodoroRequest("reset")} variant="primary" style={{ backgroundColor: '#8E8E93' }} />
+      <AppButton 
+        title="Rozpocznij sesję skupienia (30 min)" 
+        onPress={() => sendPomodoroRequest("focus")} 
+        style={{ backgroundColor: '#34C759', marginVertical: 5 }}
+      />
+      <AppButton 
+        title="Rozpocznij przerwę (5 min)" 
+        onPress={() => sendPomodoroRequest("break")} 
+        variant="primary" 
+        style={{ backgroundColor: '#FF3B30', marginVertical: 5 }}
+      />
+      <AppButton 
+        title="Resetuj timer" 
+        onPress={() => sendPomodoroRequest("reset")} 
+        variant="primary" 
+        style={{ backgroundColor: '#8E8E93', marginVertical: 5 }}
+      />
 
-      {esp32IP && <BrightnessControl esp32IP={esp32IP} />}
-      {esp32IP && <AutoBrightnessControl esp32IP={esp32IP} />}
+      <AppButton 
+        title="Ustawienia jasności" 
+        onPress={() => setShowBrightness(!showBrightness)}
+        style={{ marginVertical: 10 }}
+      />
+      {showBrightness && (
+        <View style={styles.brightnessContainer}>
+          <BrightnessControl esp32IP={esp32IP} />
+          <AutoBrightnessControl esp32IP={esp32IP} />
+        </View>
+      )}
       
       <Text style={styles.status}>{status}</Text>
     </View>
@@ -65,6 +89,11 @@ export default function PomodoroScreen() {
 }
 
 const styles = StyleSheet.create({
+  brightnessContainer: {
+    marginTop: 20,
+    width: '100%',
+    alignItems: 'center',
+  },
   status: {
     marginTop: 20,
     fontSize: 16,

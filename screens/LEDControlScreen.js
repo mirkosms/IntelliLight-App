@@ -30,8 +30,8 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
   const [activeWhiteEffect, setActiveWhiteEffect] = useState(null);
   const [showWhiteOptions, setShowWhiteOptions] = useState(false);
   const [showContinuousOptions, setShowContinuousOptions] = useState(false);
+  const [showBrightness, setShowBrightness] = useState(false);
 
-  // Funkcje pomocnicze dla Continuous Effects:
   const activateContinuousEffect = (effect) => {
     setActiveEffect(effect);
     setActiveWhiteEffect(null);
@@ -49,7 +49,6 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
     setActiveEffect(null);
   };
 
-  // Funkcja dla trybów White Temperature
   const toggleWhiteMode = (mode) => {
     if (activeWhiteEffect === mode) {
       fetch(`http://${esp32IP}/toggle/white/${mode}`)
@@ -67,7 +66,6 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
     }
   };
 
-  // Funkcja ustawiająca kolor z palety
   const choosePaletteColor = async (r, g, b) => {
     if (!esp32IP) {
       Alert.alert("Błąd", "Brak adresu ESP32");
@@ -84,7 +82,6 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
     }
   };
 
-  // Render przycisków White Temperature jako toggle buttons
   const renderWhiteOptions = () => (
     <View style={styles.buttonGroup}>
       {["neutral", "cool", "warm"].map((mode) => (
@@ -104,7 +101,6 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
     </View>
   );
 
-  // Render przycisków Continuous Effects jako toggle buttons
   const renderContinuousOptions = () => (
     <View style={styles.buttonGroup}>
       {["rainbow", "pulsing", "twinkle", "night"].map((effect) => (
@@ -161,18 +157,24 @@ export default function LEDControlScreen({ esp32IP, navigation }) {
       </TouchableOpacity>
       {showContinuousOptions && renderContinuousOptions()}
 
-      <View style={styles.brightnessContainer}>
-        <BrightnessControl esp32IP={esp32IP} />
-        <AutoBrightnessControl esp32IP={esp32IP} />
-      </View>
+      <AppButton 
+        title="Niestandardowy kolor LED" 
+        variant="secondary"
+        onPress={() => navigation.navigate('Custom LED')}
+        style={{ marginVertical: 10 }}
+      />
 
-      <View style={styles.footer}>
-        <AppButton 
-          title="Niestandardowy kolor LED" 
-          variant="secondary"
-          onPress={() => navigation.navigate('Custom LED')}
-        />
-      </View>
+      <AppButton 
+        title="Ustawienia jasności" 
+        onPress={() => setShowBrightness(!showBrightness)}
+        style={{ marginVertical: 10 }}
+      />
+      {showBrightness && (
+        <View style={styles.brightnessContainer}>
+          <BrightnessControl esp32IP={esp32IP} />
+          <AutoBrightnessControl esp32IP={esp32IP} />
+        </View>
+      )}
 
       <Text style={styles.status}>{status}</Text>
     </ScrollView>
@@ -243,9 +245,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     width: '100%',
     alignItems: 'center',
-  },
-  footer: {
-    marginTop: 30,
   },
   status: {
     marginTop: 20,
