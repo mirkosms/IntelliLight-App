@@ -16,7 +16,6 @@ export default function MenuScreen({ navigation, esp32IP }) {
     try {
       const res = await fetch(`http://esp32.local/getIP`);
       const ip = await res.text();
-      // IP jest przekazywane przez props w App.js
     } catch (error) {
       console.error("Error fetching ESP32 IP:", error);
     }

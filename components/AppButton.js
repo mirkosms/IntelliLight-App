@@ -2,7 +2,6 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
 export default function AppButton({ title, onPress, variant = 'primary', style = {} }) {
-  // Ustal kolor w zależności od wariantu: primary (domyślnie) lub secondary (np. dla "Niestandardowy kolor LED")
   const backgroundColor = variant === 'primary' ? '#007AFF' : variant === 'secondary' ? '#FFA500' : '#007AFF';
   return (
     <TouchableOpacity style={[styles.button, { backgroundColor }, style]} onPress={onPress}>

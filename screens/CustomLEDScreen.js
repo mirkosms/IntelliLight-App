@@ -1,4 +1,3 @@
-// CustomLEDScreen.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, Alert, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
