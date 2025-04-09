@@ -9,7 +9,7 @@ export default function AutoBrightnessControl({ esp32IP }) {
     fetchAutoBrightnessStatus();
     fetchLightSensorData();
     const interval = setInterval(fetchLightSensorData, 5000); // Odświeżanie co 5 sekund
-    return () => clearInterval(interval); // Czyszczenie interwału przy odmontowaniu komponentu
+    return () => clearInterval(interval);
   }, []);
 
   const fetchAutoBrightnessStatus = async () => {
@@ -22,13 +22,16 @@ export default function AutoBrightnessControl({ esp32IP }) {
     }
   };
 
-  const toggleAutoBrightness = async () => {
+  // Zmodyfikowana funkcja przyjmująca wartość z onValueChange
+  const toggleAutoBrightness = async (value) => {
+    setAutoBrightnessEnabled(value);
     try {
       const res = await fetch(`http://${esp32IP}/toggle/autobrightness`);
       const status = await res.text();
-      setAutoBrightnessEnabled(status.includes("ON"));
+      // Opcjonalnie można zsynchronizować: setAutoBrightnessEnabled(status.includes("ON"));
     } catch (error) {
       console.error("Błąd przełączania trybu automatycznej jasności:", error);
+      setAutoBrightnessEnabled(!value);
     }
   };
 
@@ -38,7 +41,6 @@ export default function AutoBrightnessControl({ esp32IP }) {
       const data = await res.text();
       console.log("Dane z czujnika:", data);
 
-      // Nowe wyrażenie regularne, pasujące do formatu zwracanego przez ESP32
       const match = data.match(/Natężenie światła:\s*([\d.]+)\s*lx/);
       if (match) {
         setLightLevel(parseFloat(match[1]));
@@ -54,7 +56,10 @@ export default function AutoBrightnessControl({ esp32IP }) {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Automatyczna jasność</Text>
-      <Switch value={autoBrightnessEnabled} onValueChange={toggleAutoBrightness} />
+      <Switch 
+        value={autoBrightnessEnabled} 
+        onValueChange={toggleAutoBrightness} 
+      />
       <Text style={styles.lightLevel}>
         Natężenie światła: {lightLevel !== null ? `${lightLevel.toFixed(2)} lx` : "Brak danych"}
       </Text>

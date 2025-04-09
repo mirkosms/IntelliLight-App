@@ -32,14 +32,18 @@ export default function MenuScreen({ navigation, esp32IP }) {
     }
   };
 
-  const toggleMotionMode = async () => {
+  // Zmodyfikowana funkcja – przyjmuje wartość (true/false) przekazaną przez Switch.
+  const toggleMotionMode = async (value) => {
+    setMotionEnabled(value);
     if (!esp32IP) return;
     try {
       const res = await fetch(`http://${esp32IP}/toggleMotionMode`);
       const status = await res.text();
-      setMotionEnabled(status.includes("ON"));
+      // Opcjonalnie można zsynchronizować stan: setMotionEnabled(status.includes("ON"));
     } catch (error) {
       console.error("Error toggling motion sensor:", error);
+      // Jeśli wystąpi błąd, przywracamy poprzednią wartość
+      setMotionEnabled(!value);
     }
   };
 
@@ -81,7 +85,10 @@ export default function MenuScreen({ navigation, esp32IP }) {
 
       <View style={styles.switchContainer}>
         <Text style={GlobalStyles.heading2}>Czujnik ruchu</Text>
-        <Switch value={motionEnabled} onValueChange={toggleMotionMode} />
+        <Switch 
+          value={motionEnabled} 
+          onValueChange={toggleMotionMode} 
+        />
       </View>
 
       <Text style={styles.label}>Czas bezczynności (sekundy):</Text>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import Slider from '@react-native-community/slider';
 
 export default function BrightnessControl({ esp32IP }) {
@@ -28,6 +28,7 @@ export default function BrightnessControl({ esp32IP }) {
 
     try {
       await fetch(`http://${esp32IP}/brightness?value=${newBrightness}`);
+      Alert.alert("Jasność LED", `Jasność została ustawiona na: ${newBrightness}`);
     } catch (error) {
       console.error("Błąd ustawiania jasności:", error);
     }
