@@ -4,21 +4,18 @@ import BrightnessControl from '../components/BrightnessControl';
 import AutoBrightnessControl from '../components/AutoBrightnessControl';
 import AppButton from '../components/AppButton';
 import { GlobalStyles } from '../GlobalStyles';
-import * as Progress from 'react-native-progress';  // <-- konieczne
+import * as Progress from 'react-native-progress';
 
 export default function PomodoroScreen() {
   const [esp32IP, setEsp32IP] = useState(null);
   const [status, setStatus] = useState('');
   const [showBrightness, setShowBrightness] = useState(false);
-
-  // Dodane stany timera:
   const [mode, setMode] = useState(null);         // 'focus' | 'break' | null
-  const [total, setTotal] = useState(0);          // sekundy
-  const [remaining, setRemaining] = useState(0);  // sekundy
+  const [total, setTotal] = useState(0);    
+  const [remaining, setRemaining] = useState(0);
   const [running, setRunning] = useState(false);
 
   useEffect(() => {
-    // fetch ESP32 IP
     (async () => {
       try {
         const res = await fetch('http://esp32.local/getIP');
@@ -72,7 +69,7 @@ export default function PomodoroScreen() {
       setRemaining(0);
     }
 
-    // oraz oryginalny fetch:
+    // oryginalny fetch:
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 5000);
@@ -113,7 +110,7 @@ export default function PomodoroScreen() {
         style={{ backgroundColor: '#8E8E93', marginVertical: 5 }}
       />
 
-      {/*  TUTAJ KOŁOWY WYKRES */}
+      {/* KOŁOWY WYKRES */}
       { total > 0 && (
         <View style={styles.timerContainer}>
           <Progress.Circle

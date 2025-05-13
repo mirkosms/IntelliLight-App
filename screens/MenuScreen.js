@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, Switch } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Switch, Image } from 'react-native';
 import { GlobalStyles } from '../GlobalStyles';
 import AppButton from '../components/AppButton';
 
@@ -32,17 +32,14 @@ export default function MenuScreen({ navigation, esp32IP }) {
     }
   };
 
-  // Zmodyfikowana funkcja – przyjmuje wartość (true/false) przekazaną przez Switch.
   const toggleMotionMode = async (value) => {
     setMotionEnabled(value);
     if (!esp32IP) return;
     try {
       const res = await fetch(`http://${esp32IP}/toggleMotionMode`);
       const status = await res.text();
-      // Opcjonalnie można zsynchronizować stan: setMotionEnabled(status.includes("ON"));
     } catch (error) {
       console.error("Error toggling motion sensor:", error);
-      // Jeśli wystąpi błąd, przywracamy poprzednią wartość
       setMotionEnabled(!value);
     }
   };
@@ -59,7 +56,15 @@ export default function MenuScreen({ navigation, esp32IP }) {
 
   return (
     <View style={GlobalStyles.screenContainer}>
-      <Text style={styles.welcomeText}>Witaj w aplikacji IntelliLight!</Text>
+      <Text style={styles.welcomeText}>Witaj w aplikacji</Text>
+
+      {/* Logo IntelliLight */}
+      <Image
+        source={require('../assets/logo.png')}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+
       <Text style={GlobalStyles.heading1}>Wybierz opcję:</Text>
       
       <AppButton 
@@ -104,11 +109,20 @@ export default function MenuScreen({ navigation, esp32IP }) {
 }
 
 const styles = StyleSheet.create({
+  logo: {
+    width: 200 * 2.5,          // Szerokość logo
+    height: 60 * 2.5,          // Wysokość logo
+    alignSelf: 'center',
+    marginBottom: 5,
+  },
   welcomeText: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#222',
-    marginBottom: 15,
+    marginBottom: -40,
+    width: '80%',
+    textAlign: 'right',
+    textAlignVertical: 'center',
   },
   mainButton: {
     width: '80%',
