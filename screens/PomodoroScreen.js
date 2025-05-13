@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 import BrightnessControl from '../components/BrightnessControl';
 import AutoBrightnessControl from '../components/AutoBrightnessControl';
 import AppButton from '../components/AppButton';
@@ -9,11 +9,11 @@ import * as Progress from 'react-native-progress';
 export default function PomodoroScreen() {
   const [esp32IP, setEsp32IP] = useState(null);
   const [status, setStatus] = useState('');
-  const [showBrightness, setShowBrightness] = useState(false);
-  const [mode, setMode] = useState(null);         // 'focus' | 'break' | null
-  const [total, setTotal] = useState(0);    
+  const [mode, setMode] = useState(null);
+  const [total, setTotal] = useState(0);
   const [remaining, setRemaining] = useState(0);
   const [running, setRunning] = useState(false);
+  const [showBrightness, setShowBrightness] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -21,14 +21,12 @@ export default function PomodoroScreen() {
         const res = await fetch('http://esp32.local/getIP');
         const ip = await res.text();
         setEsp32IP(ip);
-      } catch (error) {
-        console.error("Błąd pobierania IP ESP32:", error);
+      } catch {
         setStatus('Brak adresu ESP32');
       }
     })();
   }, []);
 
-  // Odliczanie:
   useEffect(() => {
     if (!running) return;
     const timer = setInterval(() => {
@@ -44,14 +42,12 @@ export default function PomodoroScreen() {
     return () => clearInterval(timer);
   }, [running]);
 
-  // Wysyłanie żądania + ustawienie timera w UI:
   const sendPomodoroRequest = async (m) => {
     if (!esp32IP) {
       setStatus('Brak adresu ESP32');
       return;
     }
 
-    // tylko tutaj modyfikujemy stan:
     if (m === 'focus') {
       setMode('focus');
       setTotal(30 * 60);
@@ -62,14 +58,13 @@ export default function PomodoroScreen() {
       setTotal(5 * 60);
       setRemaining(5 * 60);
       setRunning(true);
-    } else { // reset
+    } else {
       setMode(null);
       setRunning(false);
       setTotal(0);
       setRemaining(0);
     }
 
-    // oryginalny fetch:
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 5000);
@@ -78,12 +73,10 @@ export default function PomodoroScreen() {
       const text = await res.text();
       setStatus(text);
     } catch (error) {
-      console.error("Błąd połączenia:", error);
       setStatus('Błąd połączenia: ' + error.message);
     }
   };
 
-  // pomocnik formatu czasu:
   const formatTime = secs => {
     const m = Math.floor(secs / 60);
     const s = secs % 60;
@@ -91,16 +84,22 @@ export default function PomodoroScreen() {
   };
 
   return (
-    <View style={GlobalStyles.screenContainer}>
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent}>
+      <Image
+        source={require('../assets/pomodoroTimer.png')}
+        style={styles.pomodoroLogo}
+        resizeMode="contain"
+      />
+
       <Text style={GlobalStyles.heading1}>Timer Pomodoro</Text>
       
       <AppButton 
-        title="Rozpocznij sesję skupienia (30 min)" 
+        title="Rozpocznij sesję skupienia" 
         onPress={() => sendPomodoroRequest("focus")} 
         style={{ backgroundColor: '#34C759', marginVertical: 5 }}
       />
       <AppButton 
-        title="Rozpocznij przerwę (5 min)" 
+        title="Rozpocznij przerwę" 
         onPress={() => sendPomodoroRequest("break")} 
         style={{ backgroundColor: '#FF3B30', marginVertical: 5 }}
       />
@@ -110,7 +109,6 @@ export default function PomodoroScreen() {
         style={{ backgroundColor: '#8E8E93', marginVertical: 5 }}
       />
 
-      {/* KOŁOWY WYKRES */}
       { total > 0 && (
         <View style={styles.timerContainer}>
           <Progress.Circle
@@ -125,26 +123,36 @@ export default function PomodoroScreen() {
             borderWidth={0}
           />
         </View>
-      ) }
+      )}
 
       <AppButton 
         title="Ustawienia jasności" 
         onPress={() => setShowBrightness(!showBrightness)}
         style={{ marginVertical: 10 }}
       />
-      { showBrightness && (
+      {showBrightness && (
         <View style={styles.brightnessContainer}>
           <BrightnessControl esp32IP={esp32IP} />
           <AutoBrightnessControl esp32IP={esp32IP} />
         </View>
-      ) }
-      
+      )}
+
       <Text style={styles.status}>{status}</Text>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContent: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  pomodoroLogo: {
+    width: 200 * 2.5,
+    height: 60 * 2.5,
+    alignSelf: 'center',
+    marginBottom: 15,
+  },
   timerContainer: {
     alignItems: 'center',
     marginVertical: 20,

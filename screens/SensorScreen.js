@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import AppButton from '../components/AppButton';
 import { GlobalStyles } from '../GlobalStyles';
 
@@ -52,6 +52,13 @@ export default function SensorScreen() {
 
   return (
     <View style={GlobalStyles.screenContainer}>
+      {/* Sensor Data Logo*/}
+      <Image
+        source={require('../assets/sensorData.png')}
+        style={styles.sensorLogo}
+        resizeMode="contain"
+      />
+
       <Text style={GlobalStyles.heading1}>Dane z czujników</Text>
       <AppButton title="Odczytaj dane" onPress={fetchSensorData} />
 
@@ -72,17 +79,24 @@ export default function SensorScreen() {
 }
 
 const styles = StyleSheet.create({
+  sensorLogo: {
+    width: 200 * 2.5,          // Szerokość logo
+    height: 60 * 2.5,          // Wysokość logo
+    alignSelf: 'center',
+    marginBottom: 15,
+  },
   sensorData: {
     marginTop: 20,
+    marginBottom: 15,
     alignItems: 'center',
   },
   dataLabel: {
-    fontSize: 18,
+    fontSize: 28,
     fontWeight: '600',
     color: '#333',
   },
   dataValue: {
-    fontSize: 24,
+    fontSize: 34,
     color: '#007AFF',
     marginBottom: 10,
   },
