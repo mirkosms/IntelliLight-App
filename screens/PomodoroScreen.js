@@ -4,36 +4,34 @@ import BrightnessControl from '../components/BrightnessControl';
 import AutoBrightnessControl from '../components/AutoBrightnessControl';
 import AppButton from '../components/AppButton';
 import { GlobalStyles } from '../GlobalStyles';
-import * as Progress from 'react-native-progress';  // <-- nowa zależność
+import * as Progress from 'react-native-progress';  // <-- konieczne
 
 export default function PomodoroScreen() {
   const [esp32IP, setEsp32IP] = useState(null);
   const [status, setStatus] = useState('');
   const [showBrightness, setShowBrightness] = useState(false);
 
-  // Stan timera:
+  // Dodane stany timera:
   const [mode, setMode] = useState(null);         // 'focus' | 'break' | null
-  const [total, setTotal] = useState(0);          // sekundy całkowite
-  const [remaining, setRemaining] = useState(0);  // sekundy pozostałe
+  const [total, setTotal] = useState(0);          // sekundy
+  const [remaining, setRemaining] = useState(0);  // sekundy
   const [running, setRunning] = useState(false);
 
-  // Pobranie IP ESP32
   useEffect(() => {
-    fetchESP32IP();
+    // fetch ESP32 IP
+    (async () => {
+      try {
+        const res = await fetch('http://esp32.local/getIP');
+        const ip = await res.text();
+        setEsp32IP(ip);
+      } catch (error) {
+        console.error("Błąd pobierania IP ESP32:", error);
+        setStatus('Brak adresu ESP32');
+      }
+    })();
   }, []);
 
-  const fetchESP32IP = async () => {
-    try {
-      const res = await fetch('http://esp32.local/getIP');
-      const ip = await res.text();
-      setEsp32IP(ip);
-    } catch (error) {
-      console.error("Błąd pobierania IP ESP32:", error);
-      setStatus('Brak adresu ESP32');
-    }
-  };
-
-  // Odliczanie
+  // Odliczanie:
   useEffect(() => {
     if (!running) return;
     const timer = setInterval(() => {
@@ -49,14 +47,14 @@ export default function PomodoroScreen() {
     return () => clearInterval(timer);
   }, [running]);
 
-  // Wysyłanie żądania + ustawienie timera
+  // Wysyłanie żądania + ustawienie timera w UI:
   const sendPomodoroRequest = async (m) => {
     if (!esp32IP) {
       setStatus('Brak adresu ESP32');
       return;
     }
 
-    // Ustaw timer w UI
+    // tylko tutaj modyfikujemy stan:
     if (m === 'focus') {
       setMode('focus');
       setTotal(30 * 60);
@@ -67,14 +65,14 @@ export default function PomodoroScreen() {
       setTotal(5 * 60);
       setRemaining(5 * 60);
       setRunning(true);
-    } else if (m === 'reset') {
+    } else { // reset
       setMode(null);
       setRunning(false);
       setTotal(0);
       setRemaining(0);
     }
 
-    // Wyślij do ESP32
+    // oraz oryginalny fetch:
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 5000);
@@ -88,7 +86,7 @@ export default function PomodoroScreen() {
     }
   };
 
-  // Format MM:SS
+  // pomocnik formatu czasu:
   const formatTime = secs => {
     const m = Math.floor(secs / 60);
     const s = secs % 60;
@@ -115,33 +113,34 @@ export default function PomodoroScreen() {
         style={{ backgroundColor: '#8E8E93', marginVertical: 5 }}
       />
 
-      {/* Timer (zawsze w tym samym miejscu, jeśli total>0) */}
-      {total > 0 && (
+      {/*  TUTAJ KOŁOWY WYKRES */}
+      { total > 0 && (
         <View style={styles.timerContainer}>
-          <Text style={styles.timerText}>{formatTime(remaining)}</Text>
-          <Progress.Bar
+          <Progress.Circle
+            size={150}
             progress={remaining / total}
-            width={200}
-            height={10}
+            showsText
+            formatText={() => formatTime(remaining)}
+            textStyle={{ fontWeight: 'bold' }}
+            thickness={8}
             color={mode === 'focus' ? '#34C759' : '#FF3B30'}
             unfilledColor="#EEE"
             borderWidth={0}
-            style={{ marginTop: 8 }}
           />
         </View>
-      )}
+      ) }
 
       <AppButton 
         title="Ustawienia jasności" 
         onPress={() => setShowBrightness(!showBrightness)}
         style={{ marginVertical: 10 }}
       />
-      {showBrightness && (
+      { showBrightness && (
         <View style={styles.brightnessContainer}>
           <BrightnessControl esp32IP={esp32IP} />
           <AutoBrightnessControl esp32IP={esp32IP} />
         </View>
-      )}
+      ) }
       
       <Text style={styles.status}>{status}</Text>
     </View>
@@ -152,10 +151,6 @@ const styles = StyleSheet.create({
   timerContainer: {
     alignItems: 'center',
     marginVertical: 20,
-  },
-  timerText: {
-    fontSize: 32,
-    fontWeight: 'bold',
   },
   brightnessContainer: {
     marginTop: 20,
